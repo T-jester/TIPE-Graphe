@@ -157,13 +157,20 @@ class Environment_G (object) :
 
 
 
+
+
+
+
+
+## Application : recherche de stratégie 
+
+
+
+
+
+
 ## Données
-from os import chdir
-chdir(r"C:\Users\felix\Desktop\Prépa\TIPE\Fichier_propres")
-from Jeu_Graphe import Environment_G
-import numpy as np
 import matplotlib.pyplot as plt
-import networkx as nx
 import time
 
 # Paramètres relatifs au jeu
@@ -178,7 +185,7 @@ n_eval,n_steps, eps, eps_decr, eps_min  = 100, 5, 0.8, 0.97, 0.3
 N = (pop_size+1)//2
 
 
-# Proporsion de la population sauvée pour considérer
+# Proporsion de la population sauvée pour considérer le résultat comme satisfaisant
 condition = 0.7
 
 # Faire la moyenne sur les n_average premiers individus
@@ -186,6 +193,7 @@ n_average = pop_size
 
 # Création de la population aléatoire initiale
 #pop = np.random.randint(-mu,mu+1, size = (pop_size,n_gene))
+# Garder en mémoire le meilleur
 #best_gene = (0, np.zeros(6,dtype = int))
 
 # Mémoire
@@ -201,7 +209,7 @@ def import_val() :
     """ return the list of tuples : (step, best_val,
                                     best_gene, epsilon) """
 
-    bd = sqlite3.connect("D:\info\SQL\GENETIK's.sql")
+    bd = sqlite3.connect(path)
     c = bd.cursor()
     L = c.execute("SELECT * FROM Valeurs;").fetchall()
     bd.close()
@@ -213,7 +221,7 @@ def import_val() :
 def save_best_val(step, best_val, best_gene, epsilon) :
 
 
-    bd = sqlite3.connect("D:\info\SQL\GENETIK's.sql")
+    bd = sqlite3.connect(path)
     c = bd.cursor()
     c.execute(f"INSERT INTO Valeurs (step, best_val, best_gene, epsilon) VALUES {(step, best_val, str(best_gene), epsilon)};")
     bd.commit()
@@ -223,7 +231,7 @@ def save_best_val(step, best_val, best_gene, epsilon) :
 
 
 
-## Algo utiles
+## Algorithmes utiles
 
 
 def floydwarsahll (G) :
@@ -358,6 +366,9 @@ def IA_Vitality(G) :
 
 ## IA Commune
 
+# Pas optimisée : une meilleure forme serait de tout réunir autour d'une seule boucle for au lieu de faire les mêmes répétitions... 
+# Cette version est cependant plus claire donc je la laisse
+
 def IA_common(l,G) :
 
     dens = IA_Dense(G)
@@ -410,7 +421,7 @@ def jeu_IA(IA, G, nb_vaccin) :
 
 
 
-## Algo genetique
+## Algorithme genetique
 
 assert n_average <= pop_size
 
