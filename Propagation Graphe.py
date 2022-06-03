@@ -140,9 +140,6 @@ class Environment_G (object) :
 
 
 
-
-
-
     #Permet au joueur de jouer à son tour
     def step(self, node) :
         try :
@@ -156,6 +153,152 @@ class Environment_G (object) :
 
 
 
+    #affiche le graphe et joue
+    def jeu_gameplay(self, n_ini = 1, n_avance = 0, IA = None) :
+        assert not self.training
+
+        self.clear()
+        self.start(n_ini,n_avance)
+        is_ended = False
+
+
+        fig, ax = plt.subplots()
+        fig.set_size_inches((19,9))
+        plt.subplots_adjust(bottom=0.2)
+        pos = nx.spring_layout(self.graph)
+        nx.draw_networkx_edges(self.graph, pos=pos, ax=ax)
+        nx.draw_networkx_nodes(self.graph, pos=pos, node_color=self.color,  ax=ax)
+        nx.draw_networkx_labels(self.graph, pos=pos, labels=dict(zip(list(range(len(self.graph))),list(range(len(self.graph))))), ax=ax)
+        if IA is None :
+            IA = lambda x : np.random.randint(self.taille)
+
+
+
+
+        def finish() :
+            ax.clear()
+            nx.draw_networkx_edges(self.graph, pos=pos, ax=ax)
+            nx.draw_networkx_nodes(self.graph, pos=pos, node_color=self.color,  ax=ax)
+            nx.draw_networkx_labels(self.graph, pos=pos, labels=dict(zip(range(len(self.graph)),range(len(self.graph)))), ax=ax)
+
+
+            plt.text(2.2,6.5, "Félicitation" if self.n_infect<=self.taille/2 else "Dommage", horizontalalignment = 'center', verticalalignment = 'center', color = 'yellow', fontsize = 60, alpha = 0.9, bbox=dict(facecolor='red', alpha=0.7,boxstyle = 'round4'))
+            ax.set_title(f'{self.taille-self.n_infect} personnes sauvées')
+
+
+
+        def help(x) :
+            try :
+                node = IA(self)
+                self.step(node)
+                self.color[node] = '#C5F51C'
+                if self.is_finished() :
+                    finish()
+
+                else :
+                    nx.draw_networkx_edges(self.graph, pos=pos, ax=ax)
+                    nx.draw_networkx_nodes(self.graph, pos=pos, node_color=self.color, ax=ax)
+                    nx.draw_networkx_labels(self.graph, pos=pos, labels=dict(zip(range(len(self.graph)),range(len(self.graph)))), ax=ax)
+
+            except :
+                pass #cela correspond aux entrées typique "" par défaut
+
+
+        new_button3 = plt.axes([0.41, 0.05, 0.1, 0.075])
+        button3 = Button(new_button3, 'Help', color='.90', hovercolor='1')
+        cid1 = button3.on_clicked(help)
+
+
+
+        def update(x):
+            if not x.isnumeric() :
+                pass
+
+            try :
+                if self.is_finished() :
+                    finish()
+                else :
+                    ax.clear()
+                    y = int(x)
+                    if y>self.taille or y<0 or self.color[y] != '#1CC5F5' :
+                        raise Exception('LengthError Taille incorrecte')
+                    self.color[y] = '#C5F51C'
+                    self.graph.nodes[y]['type'] = 'vaccinated'
+
+                    if self.is_finished() :
+                        finish()
+
+                    else :
+                        nx.draw_networkx_edges(self.graph, pos=pos, ax=ax)
+                        nx.draw_networkx_nodes(self.graph, pos=pos, node_color=self.color, ax=ax)
+                        nx.draw_networkx_labels(self.graph, pos=pos, labels=dict(zip(range(len(self.graph)),range(len(self.graph)))), ax=ax)
+
+                        text.set_val("")
+
+            except :
+                ax.clear()
+                nx.draw_networkx_edges(self.graph, pos=pos, ax=ax)
+                nx.draw_networkx_nodes(self.graph, pos=pos, node_color=self.color,  ax=ax)
+                nx.draw_networkx_labels(self.graph, pos=pos, labels=dict(zip(range(len(self.graph)),range(len(self.graph)))), ax=ax)
+                text.set_val("")
+
+
+
+
+        def infect(x) :
+            if self.is_finished() :
+                finish()
+
+            else :
+                ax.clear()
+                new_infected = self.spread()
+                for new_pos in new_infected :
+                    self.color[new_pos] = '#E33A0A'
+
+                if self.is_finished() :
+                    finish()
+
+                else :
+                    nx.draw_networkx_edges(self.graph, pos=pos, ax=ax)
+                    nx.draw_networkx_nodes(self.graph, pos=pos, node_color=self.color,  ax=ax)
+                    nx.draw_networkx_labels(self.graph, pos=pos, labels=dict(zip(range(len(self.graph)),range(len(self.graph)))), ax=ax)
+
+
+
+        posbutton = plt.axes([0.81, 0.05, 0.1, 0.075])
+        button = Button(posbutton, 'Infecter', color='.90', hovercolor='1')
+        cid_butt = button.on_clicked(infect)
+
+
+
+
+        postxtbox = plt.axes([0.7, 0.05, 0.1, 0.075]) #position sur l'affichage
+        
+        # textbox placé en (postxtbox) sur l'écran, se nommant vacciner, sans valeur initiale, couleur initiale, couleur quand la souris touche, 
+        # distance label et côté droit du textbox
+        text = TextBox(postxtbox, 'vacciner' , initial='', color='.90', hovercolor='1', label_pad=0.01) 
+
+        cid_text = text.on_submit(update) #change quand on clique sur entrée (sinon on_text_change()
+
+        def restart(x) :
+            plt.close(fig)
+            self.jeu_gameplay(n_ini, n_avance, IA)
+        def leave(x) :
+            plt.close(fig)
+
+        new_button1 = plt.axes([0.19, 0.05, 0.1, 0.075])
+        button1 = Button(new_button1, 'Leave', color='.90', hovercolor='1')
+        cid1 = button1.on_clicked(leave)
+
+        new_button2 = plt.axes([0.3, 0.05, 0.1, 0.075])
+        button2 = Button(new_button2, 'Restart', color='.90', hovercolor='1')
+        cid2 = button2.on_clicked(restart)
+
+
+
+
+
+        plt.show()
 
 
 
