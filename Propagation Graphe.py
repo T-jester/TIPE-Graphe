@@ -419,21 +419,20 @@ def argmax(l) :
     return temp
 
 
-def qsort(l, debut, fin):
-    """ Tri du plus grand au plus petit """
-    if debut >= fin: return
 
-    i, j = debut, fin
-    pivot = l[(debut+fin)//2]
 
-    while i <= j:
-        while l[i] > pivot: i += 1
-        while l[j] < pivot: j -= 1
-        if i <= j:
-            l[i], l[j] = l[j], l[i]
-            i, j = i + 1, j - 1
-    qsort(l, debut, j)
-    qsort(l, i, fin)
+def tri_insertion(l):
+    """ On s'attend à ce qu'il n'y ait pas grand changements d'odre (les premiers le resteront en général)
+    Cet algorithme a beau avoir une compléxité O(n^2) il est cependant linéaire pour les listes déjà triées :) """
+    for i in range(1,len(l)):
+        val = L[i]
+        j = i-1
+        while j>=0 and L[j] < val:
+            L[j+1] = L[j] # decalage
+            j = j-1
+        L[j+1] = val
+
+
 
 
 
@@ -578,7 +577,7 @@ for episode_count in range(1,n_steps+1) :
     vict = [(evaluate(pop[i], n, k, p_proba, p_crea, graph_type, n_eval, nb_vaccin, nb_infect_ini, avance),i) for i in range(pop_size)]
 
     # Classer la population
-    qsort(vict,0,pop_size-1)
+    tri_insertion(vict,0,pop_size-1)
     pop = [pop[i] for _,i in vict]
 
 
