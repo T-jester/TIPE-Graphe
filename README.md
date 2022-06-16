@@ -10,7 +10,7 @@ Pour Watts-Strogatz : http://snap.stanford.edu/class/cs224w-readings/watts98smal
 Pour Barabasi-Albert : https://journals.aps.org/rmp/abstract/10.1103/RevModPhys.74.47
 
 Procédure : Introduire des coefficients de centralité pour évaluer la vaccination d'un noeud. Supposer que le procédé idéal est une combinaison linéaire 
-de ces coefficients. Maximiser les résultats en faisant varier les coefficients à l'aide d'un algorithme génétique.
+de ces coefficients. Maximiser les résultats en utilisant un algorithme génétique (une descente de gradient aurait aussi fonctionné).
 
 Résultats de la recherche : La stratégie Shortest_Path (qui est du coup simplifiable en faisant juste une boucle for sur les infectés et en renvoyant le plus proche)
 est la plus efficace : les coefficients proposés par l'algorithme génétique favorisaient en général cette stratégie.
