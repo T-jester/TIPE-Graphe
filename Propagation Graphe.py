@@ -335,13 +335,13 @@ condition = 0.7
 n_average = pop_size
 
 # Création de la population aléatoire initiale
-#pop = np.random.randint(-mu,mu+1, size = (pop_size,n_gene))
+pop = np.random.randint(-mu,mu+1, size = (pop_size,n_gene))
 # Garder en mémoire le meilleur
-#best_gene = (0, np.zeros(6,dtype = int))
+best_gene = (0, np.zeros(6,dtype = int))
 
 # Mémoire
 episode_count = 0 ; mean_vict = 0
-#history_reward = []
+history_reward = []
 
 
 ## Import/Save values
